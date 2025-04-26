@@ -16,7 +16,7 @@ export default function Home() {
           <div>
             <h1 className="text-4xl font-bold mb-4">Young Kim</h1>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Hello! I&apos;m Young Kim, a sophomore at Columbia University studying Computer Science and Operations Research. I&apos;m passionate about [your interests/specialties]. Through my work, I aim to [your goals/mission]. Thanks for stopping by!
+              I&apos;m Young, a sophomore at Columbia University studying Computer Science and Operations Research. I hope to dedicate this space to share my learnings, thoughts, and memories to look back later on. Thanks for stopping by!
             </p>
           </div>
         </div>
