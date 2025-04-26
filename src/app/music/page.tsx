@@ -120,7 +120,7 @@ export default function Music() {
           {loading ? (
             <p>Loading songs...</p>
           ) : songs.length > 0 ? (
-            songs.map((song, index) => (
+            songs.map((song: Song, index: number) => (
               <div key={index} className="p-6 border rounded-lg hover:shadow-md transition-shadow bg-white">
                 <WaveformPlayer
                   url={song.url}

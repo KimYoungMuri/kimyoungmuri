@@ -1,6 +1,11 @@
 import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
-import { SupabaseAdapter } from "@next-auth/supabase-adapter";
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 const handler = NextAuth({
   providers: [
@@ -9,10 +14,29 @@ const handler = NextAuth({
       clientSecret: process.env.GITHUB_SECRET!,
     }),
   ],
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
+  callbacks: {
+    async signIn({ user }) {
+      if (!user.email) return false
+      
+      // Create user in Supabase if they don't exist
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select()
+        .eq('email', user.email)
+        .single()
+
+      if (!existingUser) {
+        await supabase.from('users').insert([
+          {
+            email: user.email,
+            name: user.name,
+          }
+        ])
+      }
+
+      return true
+    }
+  },
   secret: process.env.NEXTAUTH_SECRET,
 });
 
