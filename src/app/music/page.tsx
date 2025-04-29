@@ -14,6 +14,7 @@ export default function Music() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activePlayer, setActivePlayer] = useState<number | null>(null);
 
   const formatSongName = (fileName: string) => {
     // Remove file extension
@@ -103,8 +104,11 @@ export default function Music() {
   }, []);
 
   const handleAudioError = (error: Error) => {
-    console.error('Audio error:', error);
-    setError(`Failed to load audio file. Please check storage permissions.`);
+    console.warn('Audio loading warning:', error);
+    // Only set error if playback is actually affected
+    if (error.message.includes('Failed to load media') || error.message.includes('network error')) {
+      setError(`Failed to load audio file. Please check your internet connection.`);
+    }
   };
 
   return (
@@ -121,8 +125,9 @@ export default function Music() {
             <p>Loading songs...</p>
           ) : songs.length > 0 ? (
             songs.map((song: Song, index: number) => (
-              <div key={index} className="p-6 border rounded-lg hover:shadow-md transition-shadow bg-white">
+              <div key={song.originalName} className="p-6 border rounded-lg hover:shadow-md transition-shadow bg-white">
                 <WaveformPlayer
+                  key={`${song.originalName}-${activePlayer === index}`}
                   url={song.url}
                   songName={song.name}
                   onError={handleAudioError}

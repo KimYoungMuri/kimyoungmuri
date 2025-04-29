@@ -12,14 +12,20 @@ interface WaveformPlayerProps {
 export default function WaveformPlayer({ url, songName, onError }: WaveformPlayerProps) {
   const waveformRef = useRef<HTMLDivElement>(null)
   const wavesurfer = useRef<WaveSurfer | null>(null)
+  const cleanupFlag = useRef(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
 
   useEffect(() => {
-    if (!waveformRef.current) return
+    cleanupFlag.current = false;
 
-    wavesurfer.current = WaveSurfer.create({
+    if (!waveformRef.current) return;
+
+    // Clear the container's content
+    waveformRef.current.innerHTML = '';
+
+    const ws = WaveSurfer.create({
       container: waveformRef.current,
       waveColor: '#8D8D8D',
       progressColor: '#FF5500',
@@ -32,30 +38,57 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
       backend: 'WebAudio'
     })
 
-    const ws = wavesurfer.current // Store reference for cleanup
+    wavesurfer.current = ws
+
+    const handleReady = () => {
+      if (!cleanupFlag.current) {
+        setDuration(ws.getDuration() || 0)
+      }
+    }
+
+    const handleAudioProcess = () => {
+      if (!cleanupFlag.current) {
+        setCurrentTime(ws.getCurrentTime() || 0)
+      }
+    }
+
+    const handleFinish = () => {
+      if (!cleanupFlag.current) {
+        setIsPlaying(false)
+        ws.stop()
+      }
+    }
+
+    const handleError = (err: Error) => {
+      if (!cleanupFlag.current) {
+        onError(err)
+      }
+    }
+
+    ws.on('ready', handleReady)
+    ws.on('audioprocess', handleAudioProcess)
+    ws.on('finish', handleFinish)
+    ws.on('error', handleError)
 
     ws.load(url)
 
-    ws.on('ready', () => {
-      setDuration(ws.getDuration() || 0)
-    })
-
-    ws.on('audioprocess', () => {
-      setCurrentTime(ws.getCurrentTime() || 0)
-    })
-
-    ws.on('finish', () => {
-      setIsPlaying(false)
-      ws.stop()
-    })
-
-    ws.on('error', (err) => {
-      onError(err)
-    })
-
     return () => {
-      if (ws) {
-        ws.destroy()
+      cleanupFlag.current = true;
+      
+      // Remove all event listeners first
+      ws.un('ready', handleReady)
+      ws.un('audioprocess', handleAudioProcess)
+      ws.un('finish', handleFinish)
+      ws.un('error', handleError)
+
+      // Just stop playback and remove reference
+      if (wavesurfer.current) {
+        try {
+          wavesurfer.current.stop()
+          wavesurfer.current = null
+        } catch (e) {
+          console.warn('Cleanup warning:', e)
+        }
       }
     }
   }, [url, onError])
@@ -67,7 +100,7 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
   }
 
   const togglePlay = () => {
-    if (!wavesurfer.current) return
+    if (!wavesurfer.current || cleanupFlag.current) return
     if (isPlaying) {
       wavesurfer.current.pause()
     } else {
