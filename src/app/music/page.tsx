@@ -10,7 +10,7 @@ interface Song {
   originalName: string;
 }
 
-export default function Music() {
+export default function MusicPage() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,9 +112,9 @@ export default function Music() {
   };
 
   return (
-    <main className="min-h-screen bg-white py-12 px-4 md:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Music</h1>
+    <div className="min-h-screen bg-white pt-32">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-5xl font-extrabold mb-12">Music</h1>
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
             {error}
@@ -139,7 +139,7 @@ export default function Music() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
   

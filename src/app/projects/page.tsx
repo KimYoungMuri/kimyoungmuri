@@ -1,8 +1,10 @@
-export default function Projects() {
+'use client'
+
+export default function ProjectsPage() {
   return (
-    <main className="min-h-screen bg-white py-12 px-4 md:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Projects</h1>
+    <div className="min-h-screen bg-white pt-32">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-5xl font-extrabold mb-12">Projects</h1>
         <div className="grid gap-6">
           {/* Add your project cards/items here */}
           <div className="p-6 border rounded-lg hover:shadow-md transition-shadow">
@@ -11,7 +13,7 @@ export default function Projects() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
   
