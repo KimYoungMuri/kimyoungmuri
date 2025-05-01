@@ -23,7 +23,7 @@ export default function Home() {
               </div>
               <div className="max-w-4xl">
                 <h1 className="text-[3.5rem] leading-tight font-extrabold tracking-tight text-gray-900 mb-6">
-                  Hey, I&apos;m <span className="text-[#75B2DD]">Young.</span> I like to live, breath, and explore. Follow me on my journey. CS and OR <span className="text-[#75B2DD]">@Columbia.</span>  
+                  Hey, I&apos;m <span className="text-[#75B2DD]">Young.</span> I like to think, build, and explore. Follow me on my journey. CS and OR <span className="text-[#75B2DD]">@Columbia.</span>  
                 </h1>
               </div>
             </div>
