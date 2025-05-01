@@ -43,7 +43,7 @@ export default function Navbar() {
               <span className="relative">
                 Projects
                 <span className={`absolute bottom-0 left-0 w-full h-0.5 ${
-                  scrolled ? 'bg-white' : 'bg-[#75B2DD]'
+                  scrolled ? 'bg-white group-hover:bg-[#2E5C88]' : 'bg-[#75B2DD]'
                 } transition-all duration-200 group-hover:h-full -z-10`}></span>
               </span>
             </Link>
@@ -56,7 +56,7 @@ export default function Navbar() {
               <span className="relative">
                 Music
                 <span className={`absolute bottom-0 left-0 w-full h-0.5 ${
-                  scrolled ? 'bg-white' : 'bg-[#75B2DD]'
+                  scrolled ? 'bg-white group-hover:bg-[#2E5C88]' : 'bg-[#75B2DD]'
                 } transition-all duration-200 group-hover:h-full -z-10`}></span>
               </span>
             </Link>
@@ -69,7 +69,7 @@ export default function Navbar() {
               <span className="relative">
                 Blog
                 <span className={`absolute bottom-0 left-0 w-full h-0.5 ${
-                  scrolled ? 'bg-white' : 'bg-[#75B2DD]'
+                  scrolled ? 'bg-white group-hover:bg-[#2E5C88]' : 'bg-[#75B2DD]'
                 } transition-all duration-200 group-hover:h-full -z-10`}></span>
               </span>
             </Link>

@@ -4,11 +4,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function BlogPage() {
-  return (
+    return (
     <div className="min-h-screen bg-white pt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-5xl font-extrabold mb-12">Blog</h1>
-        <div className="grid gap-6">
+          <div className="grid gap-6">
           <article className="overflow-hidden border rounded-lg hover:shadow-lg transition-all duration-200 hover:border-gray-400 group">
             <Link href="/blog/what-why-and-how" className="no-underline block">
               <div className="flex">
@@ -26,10 +26,10 @@ export default function BlogPage() {
                 </div>
               </div>
             </Link>
-          </article>
+            </article>
+          </div>
         </div>
-      </div>
     </div>
-  );
-}
+    );
+  }
     

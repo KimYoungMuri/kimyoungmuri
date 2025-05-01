@@ -42,26 +42,26 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
 
     const handleReady = () => {
       if (!cleanupFlag.current) {
-        setDuration(ws.getDuration() || 0)
+      setDuration(ws.getDuration() || 0)
       }
     }
 
     const handleAudioProcess = () => {
       if (!cleanupFlag.current) {
-        setCurrentTime(ws.getCurrentTime() || 0)
+      setCurrentTime(ws.getCurrentTime() || 0)
       }
     }
 
     const handleFinish = () => {
       if (!cleanupFlag.current) {
-        setIsPlaying(false)
-        ws.stop()
+      setIsPlaying(false)
+      ws.stop()
       }
     }
 
     const handleError = (err: Error) => {
       if (!cleanupFlag.current) {
-        onError(err)
+      onError(err)
       }
     }
 
