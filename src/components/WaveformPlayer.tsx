@@ -16,9 +16,11 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
   const [isPlaying, setIsPlaying] = useState(false)
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     cleanupFlag.current = false;
+    setIsLoading(true);
 
     if (!waveformRef.current) return;
 
@@ -42,26 +44,28 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
 
     const handleReady = () => {
       if (!cleanupFlag.current) {
-      setDuration(ws.getDuration() || 0)
+        setDuration(ws.getDuration() || 0)
+        setIsLoading(false)
       }
     }
 
     const handleAudioProcess = () => {
       if (!cleanupFlag.current) {
-      setCurrentTime(ws.getCurrentTime() || 0)
+        setCurrentTime(ws.getCurrentTime() || 0)
       }
     }
 
     const handleFinish = () => {
       if (!cleanupFlag.current) {
-      setIsPlaying(false)
-      ws.stop()
+        setIsPlaying(false)
+        ws.stop()
       }
     }
 
     const handleError = (err: Error) => {
       if (!cleanupFlag.current) {
-      onError(err)
+        setIsLoading(false)
+        onError(err)
       }
     }
 
@@ -114,7 +118,8 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
       <div className="flex items-center gap-4 mb-2">
         <button
           onClick={togglePlay}
-          className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+          className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors text-white"
+          disabled={isLoading}
         >
           {isPlaying ? (
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -127,13 +132,24 @@ export default function WaveformPlayer({ url, songName, onError }: WaveformPlaye
           )}
         </button>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold">{songName}</h3>
-          <div className="text-sm text-gray-500">
+          <h3 className="text-lg font-semibold text-white">{songName}</h3>
+          <div className="text-sm text-white/70">
             {formatTime(currentTime)} / {formatTime(duration)}
           </div>
         </div>
       </div>
-      <div ref={waveformRef} className="w-full rounded-lg overflow-hidden" />
+      <div className="relative">
+        {isLoading && (
+          <div className="absolute inset-0 z-10">
+            <div className="w-full h-[80px] bg-white/5 rounded-lg overflow-hidden flex items-center">
+              <div className="w-full h-[2px] bg-white/20">
+                <div className="w-full h-full bg-white/10 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={waveformRef} className={`w-full rounded-lg overflow-hidden transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`} />
+      </div>
     </div>
   )
 } 
