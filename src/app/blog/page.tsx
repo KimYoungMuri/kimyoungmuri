@@ -23,6 +23,7 @@ export default function BlogPage() {
             <article className="p-6 rounded-lg transition-all duration-200 bg-transparent text-white hover:bg-white/10">
               <Link href="/blog/what-why-and-how" className="no-underline block">
                 <div className="flex flex-col md:flex-row gap-6">
+                  {/* Blog post image - commented out
                   <div className="relative w-full md:w-48 h-48 md:h-auto flex-shrink-0 rounded-lg overflow-hidden">
                     <Image
                       src="https://ypottlfvonabokhszolz.supabase.co/storage/v1/object/public/blog//intro_pic.jpg"
@@ -31,6 +32,7 @@ export default function BlogPage() {
                       className="object-cover transition-transform duration-200 group-hover:scale-105"
                     />
                   </div>
+                  */}
                   <div className="flex-grow">
                     <h2 className="text-2xl font-semibold mb-3 text-white">What, Why, and How</h2>
                     <div className="text-sm text-white/70 mb-4">April 28, 2024</div>
