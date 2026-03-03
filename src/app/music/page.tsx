@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseStorageUrl } from '@/lib/supabase'
 import WaveformPlayer from '@/components/WaveformPlayer'
 import Image from 'next/image'
 
@@ -132,7 +132,7 @@ export default function MusicPage() {
     <div className="min-h-screen relative">
       <div className="absolute inset-0 w-full h-full">
         <Image
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}/storage/v1/object/public/music/background.jpg`}
+          src={`${supabaseStorageUrl}/storage/v1/object/public/music/background.jpg`}
           alt="Music Background"
           fill
           className="object-cover object-[20%_center]"
@@ -161,7 +161,7 @@ export default function MusicPage() {
                 </div>
                 <p className="mt-2 text-white/70">{loadingProgress}%</p>
               </div>
-            ) : songs.length > 0 ? (
+            ) : error ? null : songs.length > 0 ? (
               songs.map((song: Song, index: number) => (
                 <div key={song.originalName} className="p-6 rounded-lg hover:shadow-md transition-shadow bg-transparent text-white">
                   <WaveformPlayer

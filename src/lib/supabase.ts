@@ -1,8 +1,13 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+// Fallback so public storage images work even if env is not set on Vercel (same project as QuantGuide image)
+const FALLBACK_SUPABASE_URL = 'https://fhrgjouuzsjecqskxhoy.supabase.co'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? FALLBACK_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
 
 export const supabase: SupabaseClient | null =
   supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null
-export { supabaseUrl } 
+export { supabaseUrl }
+/** Base URL for public storage (env or fallback). Use for building image URLs. */
+export const supabaseStorageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_SUPABASE_URL 

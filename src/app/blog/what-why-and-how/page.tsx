@@ -1,3 +1,5 @@
+import { supabaseStorageUrl } from '@/lib/supabase';
+
 export default function WhatWhyAndHow() {
   return (
     <main className="min-h-screen bg-white py-12 px-4 md:px-8">
@@ -8,7 +10,7 @@ export default function WhatWhyAndHow() {
         {/* Replace YOUR_IMAGE_URL with the actual URL from Supabase storage */}
         <div className="my-8">
           <img 
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}/storage/v1/object/public/blog/intro_pic.jpg`}
+            src={`${supabaseStorageUrl}/storage/v1/object/public/blog/intro_pic.jpg`}
             alt="Blog post featured image"
             className="w-full rounded-lg shadow-lg"
           />

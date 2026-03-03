@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { supabaseStorageUrl } from '@/lib/supabase';
 
 export default function BlogPage() {
     return (
     <div className="min-h-[150vh] relative">
       <div className="absolute inset-0 w-full h-full">
         <Image
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}/storage/v1/object/public/blog/w_dad.jpg`}
+          src={`${supabaseStorageUrl}/storage/v1/object/public/blog/w_dad.jpg`}
           alt="Blog Background"
           fill
           className="object-cover"
