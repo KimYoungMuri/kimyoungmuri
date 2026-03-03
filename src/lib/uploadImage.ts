@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 
 export async function uploadBlogImage(file: File, blogSlug: string) {
+  if (!supabase) throw new Error('Storage is not configured.')
   try {
     const fileExt = file.name.split('.').pop()
     const fileName = `${blogSlug}/${Date.now()}.${fileExt}`

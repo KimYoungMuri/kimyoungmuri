@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 
 export async function upload3DModel(file: File) {
+  if (!supabase) throw new Error('Storage is not configured.')
   try {
     const fileName = `models/${Date.now()}_${file.name}`
 
