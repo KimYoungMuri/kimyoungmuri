@@ -20,6 +20,7 @@ export default function ProjectCard({ title, description, imageUrl, link, date, 
             alt={title}
             fill
             className="object-cover transform group-hover:scale-105 transition-transform duration-300"
+            unoptimized
           />
         </div>
       </Link>

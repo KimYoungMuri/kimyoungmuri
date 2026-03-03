@@ -8,11 +8,12 @@ export default function BlogPage() {
     <div className="min-h-[150vh] relative">
       <div className="absolute inset-0 w-full h-full">
         <Image
-          src="https://ypottlfvonabokhszolz.supabase.co/storage/v1/object/public/blog//w_dad.jpg"
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}/storage/v1/object/public/blog/w_dad.jpg`}
           alt="Blog Background"
           fill
           className="object-cover"
           priority
+          unoptimized
         />
         <div className="absolute inset-0 bg-black bg-opacity-50" />
       </div>

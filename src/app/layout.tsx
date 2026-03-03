@@ -1,12 +1,25 @@
 import type { Metadata } from "next";
 import Navbar from "../components/Navbar";
-import { Inter } from "next/font/google";
+import Providers from "../components/Providers";
+import { Inter, VT323, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const vt323 = VT323({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-vt323",
+});
+
+const pressStart2P = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-press-start",
 });
 
 export const metadata: Metadata = {
@@ -20,10 +33,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`}>
+    <html lang="en" className={`${inter.variable} ${vt323.variable} ${pressStart2P.variable} scroll-smooth`}>
       <body className={`min-h-screen bg-white font-sans antialiased`}>
-        <Navbar />
-        {children}
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

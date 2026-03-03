@@ -1,9 +1,25 @@
 /** @type {import('next').NextConfig} */
+const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : ''
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  async redirects() {
+    return [
+      { source: '/quantguide', destination: '/quantguide/index.html', permanent: false },
+      { source: '/quantguide/', destination: '/quantguide/index.html', permanent: false },
+    ]
+  },
   images: {
-    domains: ['localhost', 'ypottlfvonabokhszolz.supabase.co'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'localhost', pathname: '/**' },
+      { protocol: 'https', hostname: 'media.licdn.com', pathname: '/**' },
+      ...(supabaseHost
+        ? [{ protocol: 'https', hostname: supabaseHost, pathname: '/**' }]
+        : []),
+    ],
   },
 }
 

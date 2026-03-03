@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantGuide - Question Bank</title>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .filters select, .filters input {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .filters input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .question-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge.difficulty-hard {
+            background: #eba4a4;
+            color: #a90000;
+        }
+
+        .badge.difficulty-medium {
+            background: #A39DF2;
+            color: #2216C7;
+        }
+
+        .badge.difficulty-easy {
+            background: #C1D3FF;
+            color: #2964FD;
+        }
+
+        .badge.category {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .badge.status-unsolved { background: #e5e7eb; color: #6b7280; }
+        .badge.status-attempted { background: #fef3c7; color: #b45309; }
+        .badge.status-solved { background: #d1fae5; color: #047857; }
+
+        .question-card.status-unsolved { border-left: 4px solid #e5e7eb; }
+        .question-card.status-attempted { border-left: 4px solid #f59e0b; }
+        .question-card.status-solved { border-left: 4px solid #10b981; }
+
+        .status-select {
+            margin-top: 0.75rem;
+            padding: 0.4rem 0.6rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: white;
+            cursor: pointer;
+            color: #374151;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Card preview only: clamp to 3 lines. Modal uses .question-text too but must show full content. */
+        .question-card .question-text {
+            color: #666;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .view-btn:hover {
+            background: #5568d3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f3f4f6;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-right: 3rem;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .modal-section h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .modal-section p, .modal-section div {
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Content wrapper: scope resets so KaTeX isn't broken by global span/line-height rules */
+        .qg-content .katex {
+            font-size: 1.1em;
+        }
+
+        .qg-content .katex-display {
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+
+        /* LaTeX rendering styles (keep for backward compatibility) */
+        .katex {
+            font-size: 1.1em;
+        }
+
+        .katex-display {
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+
+        /* Prevent text breaking in math expressions */
+        .question-text, .solution {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 100%;
+            line-height: 1.8;
+        }
+
+        /* Better spacing for math content */
+        .modal-section p, .modal-section div {
+            line-height: 1.8;
+        }
+
+        /* Inline math: no line breaks inside one expression */
+        .katex {
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        /* Display math: allow line breaks so \begin{cases} etc. stack on two lines */
+        .katex-display,
+        .katex-display .katex {
+            white-space: normal;
+            display: block;
+        }
+
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        /* Spans that we rendered in display mode (e.g. matrices) must be block so they don't flatten */
+        .qg-content .math-rendered-display {
+            display: block;
+            margin: 0.8em 0;
+            overflow-x: auto;
+        }
+
+        /* Prevent awkward line breaks in text */
+        .modal-section {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        /* Better handling of long strings */
+        .question-text, .solution {
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -moz-hyphens: auto;
+        }
+
+        .solution {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stats {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stats span {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .questions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1>QuantGuide Question Bank</h1>
+                <p>Prepare for your next quant interview</p>
+            </div>
+            <div id="auth-bar" style="font-size: 1rem; opacity: 0.95;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <span id="total-questions">0</span> questions available
+            <span id="status-counts" style="margin-left: 1rem; color: #666; font-weight: normal;"></span>
+        </div>
+
+        <div class="filters">
+            <label for="difficulty-filter">Difficulty:</label>
+            <select id="difficulty-filter">
+                <option value="">All</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select>
+
+            <label for="category-filter">Category:</label>
+            <select id="category-filter">
+                <option value="">All</option>
+            </select>
+
+            <label for="status-filter">Status:</label>
+            <select id="status-filter">
+                <option value="">All</option>
+                <option value="unsolved">Unsolved</option>
+                <option value="attempted">Attempted</option>
+                <option value="solved">Solved</option>
+            </select>
+
+            <input type="text" id="search" placeholder="Search questions...">
+        </div>
+
+        <div class="questions-grid" id="questions-grid">
+            <!-- Questions will be loaded here -->
+        </div>
+    </div>
+
+    <div class="modal" id="question-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let filteredQuestions = [];
+        const STATUS_KEY = 'quantguide_question_status';
+        const STATUSES = ['unsolved', 'attempted', 'solved'];
+        let loggedInUser = null;
+        let remoteStatusMap = {};
+        let useRemoteStatus = false;
+
+        function getStatusMap() {
+            if (useRemoteStatus) return remoteStatusMap;
+            try {
+                const raw = localStorage.getItem(STATUS_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) { return {}; }
+        }
+
+        function getStatus(questionId) {
+            const map = getStatusMap();
+            const s = (map[questionId] || 'unsolved').toLowerCase();
+            return STATUSES.includes(s) ? s : 'unsolved';
+        }
+
+        function setStatus(questionId, status) {
+            if (useRemoteStatus) {
+                remoteStatusMap[questionId] = status;
+                updateStatusCounts();
+                fetch('/api/quantguide/status', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questionId, status }),
+                    credentials: 'same-origin'
+                }).catch(err => console.warn('Failed to save status', err));
+                return;
+            }
+            const map = getStatusMap();
+            map[questionId] = status;
+            localStorage.setItem(STATUS_KEY, JSON.stringify(map));
+            updateStatusCounts();
+        }
+
+        function renderAuthBar() {
+            const el = document.getElementById('auth-bar');
+            if (!el) return;
+            if (loggedInUser && loggedInUser.name) {
+                el.innerHTML = 'Hello, <strong>' + escapeHtml(loggedInUser.name) + '</strong> &nbsp;|&nbsp; <a href="/api/auth/signout?callbackUrl=' + encodeURIComponent(window.location.pathname + '/') + '" style="color: white; text-decoration: underline;">Log out</a>';
+            } else {
+                el.innerHTML = '<a href="/login?callbackUrl=' + encodeURIComponent(window.location.pathname + '/') + '" style="color: white; text-decoration: underline;">Log in</a> &nbsp;|&nbsp; <a href="/register" style="color: white; text-decoration: underline;">Register</a>';
+            }
+        }
+
+        async function fetchSessionAndStatus() {
+            try {
+                const sessionRes = await fetch('/api/auth/session', { credentials: 'same-origin' });
+                const session = sessionRes.ok ? await sessionRes.json() : null;
+                if (session && session.user) {
+                    loggedInUser = session.user;
+                    useRemoteStatus = true;
+                    const statusRes = await fetch('/api/quantguide/status', { credentials: 'same-origin' });
+                    if (statusRes.ok) {
+                        const data = await statusRes.json();
+                        remoteStatusMap = data.statuses || {};
+                    }
+                    renderQuestions();
+                    updateStatusCounts();
+                }
+            } catch (e) { console.warn('Session fetch failed', e); }
+            renderAuthBar();
+        }
+
+        function updateStatusCounts() {
+            const el = document.getElementById('status-counts');
+            if (!el || !questions.length) return;
+            const map = getStatusMap();
+            let unsolved = 0, attempted = 0, solved = 0;
+            questions.forEach(q => {
+                const s = getStatus(q.id);
+                if (s === 'unsolved') unsolved++; else if (s === 'attempted') attempted++; else solved++;
+            });
+            el.textContent = `(Unsolved: ${unsolved} · Attempted: ${attempted} · Solved: ${solved})`;
+        }
+
+        // Load questions from JSON file
+        async function loadQuestions() {
+            try {
+                // Load questions data
+                console.log('Loading questions_data.json...');
+                let response = await fetch('questions_data.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                questions = await response.json();
+                console.log(`Loaded ${questions.length} questions`);
+                
+                if (!Array.isArray(questions)) {
+                    throw new Error('Data is not an array');
+                }
+                
+                filteredQuestions = questions;
+                
+                document.getElementById('total-questions').textContent = questions.length;
+                
+                // Populate category filter
+                const categories = [...new Set(questions.map(q => q.category).filter(Boolean))].sort();
+                const categoryFilter = document.getElementById('category-filter');
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    categoryFilter.appendChild(option);
+                });
+                
+                renderQuestions();
+                updateStatusCounts();
+                fetchSessionAndStatus();
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                const errorMsg = error.message || 'Unknown error';
+                document.getElementById('questions-grid').innerHTML = 
+                    `<p style="text-align: center; padding: 2rem; color: #d32f2f; background: #ffebee; border-radius: 8px; margin: 2rem;">
+                        <strong>Error loading questions:</strong><br>
+                        ${errorMsg}<br><br>
+                        <small>
+                            Make sure you're using a local web server:<br>
+                            <code>python3 -m http.server 8000</code><br>
+                            Then visit: <code>http://localhost:8000/index.html</code><br>
+                            (Don't open the file directly - CORS will block JSON loading)
+                        </small>
+                    </p>`;
+                document.getElementById('total-questions').textContent = '0';
+            }
+        }
+
+        function renderQuestions() {
+            const grid = document.getElementById('questions-grid');
+            
+            if (filteredQuestions.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; padding: 2rem; color: #666;">No questions found matching your filters.</p>';
+                return;
+            }
+            
+            const statusMap = getStatusMap();
+            grid.innerHTML = filteredQuestions.map((q, index) => {
+                const status = getStatus(q.id);
+                const safeId = escapeHtml(q.id || '');
+                return `
+                <div class="question-card status-${status}" onclick="openModal(${index})" data-question-id="${safeId}">
+                    <div class="question-header">
+                        <div>
+                            <div class="question-title">${q.title || 'Untitled Question'}</div>
+                            <div class="badges">
+                                ${q.difficulty ? `<span class="badge difficulty-${q.difficulty.toLowerCase()}">${q.difficulty}</span>` : ''}
+                                ${q.category ? `<span class="badge category">${q.category}</span>` : ''}
+                                <span class="badge status-${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-text qg-content" data-preview-index="${index}"></div>
+                    <label style="display:block; margin-top: 0.5rem; font-size: 0.85rem; color: #666;">Status:</label>
+                    <select class="status-select" data-question-id="${safeId}" onchange="onCardStatusChange(this)" onclick="event.stopPropagation()">
+                        <option value="unsolved" ${status === 'unsolved' ? 'selected' : ''}>Unsolved</option>
+                        <option value="attempted" ${status === 'attempted' ? 'selected' : ''}>Attempted</option>
+                        <option value="solved" ${status === 'solved' ? 'selected' : ''}>Solved</option>
+                    </select>
+                    <button class="view-btn" style="margin-top: 0.75rem;" onclick="event.stopPropagation(); openModal(${index})">View Question</button>
+                </div>
+            `;
+            }).join('');
+
+            // Fill previews: data-latex HTML gets inserted and rendered; plain text gets escaped
+            grid.querySelectorAll('.question-text[data-preview-index]').forEach(el => {
+                const idx = parseInt(el.getAttribute('data-preview-index'), 10);
+                const q = filteredQuestions[idx];
+                const raw = q?.question_text || 'No question text available.';
+                if (raw.includes('data-latex')) {
+                    el.innerHTML = raw;
+                } else {
+                    el.textContent = raw;
+                }
+            });
+            renderMath(grid);
+        }
+
+        function onCardStatusChange(selectEl) {
+            const id = selectEl.getAttribute('data-question-id');
+            if (!id) return;
+            setStatus(id, selectEl.value);
+            renderQuestions();
+        }
+
+        function onModalStatusChange(selectEl) {
+            const id = selectEl.getAttribute('data-question-id');
+            if (!id) return;
+            setStatus(id, selectEl.value);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function processMathText(text) {
+            if (!text) return '';
+            
+            // The new scraper extracts clean LaTeX with proper delimiters
+            // We just need minimal processing for display (same as test_display.html)
+            
+            // Handle literal \n characters from JSON (they come as escaped strings)
+            let processed = text.replace(/\\n/g, '\n');
+            
+            // Remove newlines inside LaTeX delimiters (they shouldn't be there)
+            // This handles any edge cases where newlines got into LaTeX
+            processed = processed.replace(/\$([^$]*?)\n+([^$]*?)\$/g, function(match, p1, p2) {
+                // If both parts have content, join them
+                if (p1.trim() && p2.trim()) {
+                    return '$' + p1.trim() + ' ' + p2.trim() + '$';
+                }
+                // Otherwise keep the part with content
+                return '$' + (p1.trim() || p2.trim()) + '$';
+            });
+            
+            // Fix double display math delimiters (edge case)
+            processed = processed.replace(/\$\$\s*\$\$/g, '$$');
+            
+            // Fix text running together (but preserve LaTeX)
+            processed = processed.replace(/([a-z])([A-Z][a-z])/g, '$1 $2');
+            
+            // Convert newlines to HTML breaks
+            processed = processed.replace(/\n\n/g, '<br><br>');
+            processed = processed.replace(/\n/g, '<br>');
+            
+            // DON'T escape HTML - KaTeX needs the raw LaTeX delimiters
+            // We'll let KaTeX handle the rendering, and it's safe because
+            // we're only rendering trusted scraped content
+            
+            return processed;
+        }
+
+        // LaTeX that must be rendered in display mode (matrices, cases, etc.) so they don't appear on one line.
+        function isDisplayMath(tex) {
+            if (!tex || typeof tex !== 'string') return false;
+            const t = tex.trim();
+            return /\\begin\s*\{\s*(matrix|bmatrix|pmatrix|vmatrix|Vmatrix|Bmatrix|array|cases|aligned|align|equation|gather)/.test(t) ||
+                /\\end\s*\{\s*(matrix|bmatrix|pmatrix|vmatrix|Vmatrix|Bmatrix|array|cases|aligned|align|equation|gather)/.test(t);
+        }
+
+        // Render math from data-latex spans (katex.render per element). Call after setting innerHTML.
+        function renderMath(root) {
+            if (typeof katex === 'undefined') return;
+            const opts = { throwOnError: false, strict: 'warn' };
+            root.querySelectorAll('.math-inline').forEach((el) => {
+                const tex = el.getAttribute('data-latex') ?? '';
+                const display = isDisplayMath(tex);
+                try {
+                    katex.render(tex, el, { ...opts, displayMode: display });
+                    if (display) el.classList.add('math-rendered-display');
+                } catch (e) { console.warn('KaTeX inline:', e); }
+            });
+            root.querySelectorAll('.math-display').forEach((el) => {
+                const tex = el.getAttribute('data-latex') ?? '';
+                try {
+                    katex.render(tex, el, { ...opts, displayMode: true });
+                    el.classList.add('math-rendered-display');
+                } catch (e) { console.warn('KaTeX display:', e); }
+            });
+        }
+
+        function openModal(index) {
+            const question = filteredQuestions[index];
+            const modal = document.getElementById('question-modal');
+            const modalBody = document.getElementById('modal-body');
+            
+            const questionText = question.question_text || 'No question text available.';
+            const solutionText = question.solution || '';
+            const useDataLatex = (questionText && questionText.includes('data-latex')) || (solutionText && solutionText.includes('data-latex'));
+            
+            modalBody.innerHTML = `
+                <h2 class="modal-title">${escapeHtml(question.title || 'Untitled Question')}</h2>
+                <div class="badges" style="margin-bottom: 1.5rem;">
+                    ${question.difficulty ? `<span class="badge difficulty-${question.difficulty.toLowerCase()}">${question.difficulty}</span>` : ''}
+                    ${question.category ? `<span class="badge category">${question.category}</span>` : ''}
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Question</h3>
+                    <div class="qg-content question-text"></div>
+                </div>
+                
+                ${solutionText ? `
+                <div class="modal-section" style="margin-top: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Solution</h3>
+                        <button id="show-solution-btn" onclick="showSolution()" style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            border: none;
+                            padding: 0.6rem 1.5rem;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 0.95rem;
+                            font-weight: 500;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)';">
+                            Show Solution
+                        </button>
+                    </div>
+                    <div id="solution-content" style="display: none;">
+                        <div class="qg-content solution"></div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="modal-section" style="font-size: 0.9rem; color: #888;">
+                    <p><strong>Question ID:</strong> ${escapeHtml(question.id)}</p>
+                    <p><a href="${escapeHtml(question.url)}" target="_blank" style="color: #667eea;">View on QuantGuide →</a></p>
+                    <p style="margin-top: 0.75rem;"><strong>Status:</strong>
+                        <select class="status-select" id="modal-status-select" data-question-id="${escapeHtml(question.id)}" onchange="onModalStatusChange(this)">
+                            <option value="unsolved" ${getStatus(question.id) === 'unsolved' ? 'selected' : ''}>Unsolved</option>
+                            <option value="attempted" ${getStatus(question.id) === 'attempted' ? 'selected' : ''}>Attempted</option>
+                            <option value="solved" ${getStatus(question.id) === 'solved' ? 'selected' : ''}>Solved</option>
+                        </select>
+                    </p>
+                </div>
+            `;
+            
+            const questionDiv = modalBody.querySelector('.question-text');
+            const solutionDiv = modalBody.querySelector('.solution');
+            if (useDataLatex) {
+                questionDiv.innerHTML = questionText || 'No question text available.';
+                if (solutionDiv) solutionDiv.innerHTML = solutionText || '';
+            } else {
+                questionDiv.innerHTML = processMathText(questionText);
+                if (solutionDiv) solutionDiv.innerHTML = processMathText(solutionText);
+            }
+            
+            modal.classList.add('active');
+            
+            if (useDataLatex) {
+                setTimeout(() => renderMath(modalBody), 0);
+            } else {
+                setTimeout(() => {
+                    if (typeof renderMathInElement !== 'undefined') {
+                        try {
+                            renderMathInElement(modalBody, {
+                                delimiters: [
+                                    {left: '$$', right: '$$', display: true},
+                                    {left: '$', right: '$', display: false},
+                                    {left: '\\[', right: '\\]', display: true},
+                                    {left: '\\(', right: '\\)', display: false},
+                                    {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+                                    {left: '\\begin{align}', right: '\\end{align}', display: true}
+                                ],
+                                throwOnError: false,
+                                strict: false,
+                                output: 'html'
+                            });
+                        } catch (e) { console.error('Error rendering math:', e); }
+                    }
+                }, 200);
+            }
+        }
+
+        function showSolution() {
+            const solutionContent = document.getElementById('solution-content');
+            const showBtn = document.getElementById('show-solution-btn');
+            if (solutionContent && showBtn) {
+                solutionContent.style.display = 'block';
+                showBtn.style.display = 'none';
+                
+                // Re-render LaTeX if needed (for text-based solutions)
+                setTimeout(() => {
+                    if (typeof renderMathInElement !== 'undefined') {
+                        try {
+                            renderMathInElement(solutionContent, {
+                                delimiters: [
+                                    {left: '$$', right: '$$', display: true},
+                                    {left: '$', right: '$', display: false},
+                                    {left: '\\[', right: '\\]', display: true},
+                                    {left: '\\(', right: '\\)', display: false},
+                                    {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+                                    {left: '\\begin{align}', right: '\\end{align}', display: true}
+                                ],
+                                throwOnError: false,
+                                strict: false,
+                                output: 'html'
+                            });
+                        } catch (e) {
+                            console.error('Error rendering math:', e);
+                        }
+                    }
+                }, 100);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('question-modal').classList.remove('active');
+            renderQuestions();
+            updateStatusCounts();
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const difficulty = document.getElementById('difficulty-filter').value;
+            const category = document.getElementById('category-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const search = document.getElementById('search').value.toLowerCase();
+            
+            filteredQuestions = questions.filter(q => {
+                const matchDifficulty = !difficulty || q.difficulty === difficulty;
+                const matchCategory = !category || q.category === category;
+                const matchStatus = !statusFilter || getStatus(q.id) === statusFilter;
+                const matchSearch = !search || 
+                    (q.title && q.title.toLowerCase().includes(search)) ||
+                    (q.question_text && q.question_text.toLowerCase().includes(search));
+                
+                return matchDifficulty && matchCategory && matchStatus && matchSearch;
+            });
+            
+            renderQuestions();
+        }
+
+        // Event listeners
+        document.getElementById('difficulty-filter').addEventListener('change', applyFilters);
+        document.getElementById('category-filter').addEventListener('change', applyFilters);
+        document.getElementById('status-filter').addEventListener('change', applyFilters);
+        document.getElementById('search').addEventListener('input', applyFilters);
+
+        // Close modal on outside click
+        document.getElementById('question-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'question-modal') {
+                closeModal();
+            }
+        });
+
+        // Load questions on page load
+        loadQuestions();
+    </script>
+</body>
+</html>
+

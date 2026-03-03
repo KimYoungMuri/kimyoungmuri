@@ -126,11 +126,12 @@ export default function MusicPage() {
     <div className="min-h-screen relative">
       <div className="absolute inset-0 w-full h-full">
         <Image
-          src="https://ypottlfvonabokhszolz.supabase.co/storage/v1/object/sign/music/background.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InN0b3JhZ2UtdXJsLXNpZ25pbmcta2V5X2U0ODMwYzBmLWJkNWYtNDhlZS04ZGUzLTNkZGU3MGU4YWVhNyJ9.eyJ1cmwiOiJtdXNpYy9iYWNrZ3JvdW5kLmpwZyIsImlhdCI6MTc0NjA2MzE1NSwiZXhwIjo0ODk5NjYzMTU1fQ.kRZPSAh1766-FELuJ-LN2N6zGTD1sK3aYv64eGPt_1U"
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}/storage/v1/object/public/music/background.jpg`}
           alt="Music Background"
           fill
           className="object-cover object-[20%_center]"
           priority
+          unoptimized
         />
         <div className="absolute inset-0 bg-black bg-opacity-50" />
       </div>

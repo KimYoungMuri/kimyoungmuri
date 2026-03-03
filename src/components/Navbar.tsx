@@ -2,38 +2,84 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+
+function formatNavTime(date: Date): string {
+  const day = date.getDate().toString().padStart(2, '0')
+  const mon = date.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+  const hour = date.getHours()
+  const min = date.getMinutes()
+  const ampm = hour >= 12 ? 'PM' : 'AM'
+  const h = hour % 12 || 12
+  return `${day} ${mon} ${h}:${min.toString().padStart(2, '0')}${ampm}`
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const [now, setNow] = useState(() => new Date())
+  const [weather, setWeather] = useState<{ temp: number; code: number } | null>(null)
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(t)
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const defaultLat = 40.8075
+    const defaultLon = -73.9626
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${defaultLat}&longitude=${defaultLon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return
+        const c = data?.current
+        if (c != null) setWeather({ temp: Math.round(c.temperature_2m), code: c.weather_code })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled)
-      }
+      if (isScrolled !== scrolled) setScrolled(isScrolled)
     }
-
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [scrolled])
+
+  const weatherIcon = weather?.code != null
+    ? (weather.code === 0 ? '☀️' : weather.code < 4 ? '⛅' : '☁️')
+    : '—'
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled ? 'bg-[#75B2DD]' : 'bg-white'
     }`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-4">
           <Link 
             href="/" 
-            className={`text-2xl font-bold border-2 border-black px-3 py-1 ${
+            className={`text-2xl font-bold border-2 border-black px-3 py-1 flex-shrink-0 ${
               scrolled ? 'text-white border-white' : 'text-black border-black'
             }`}
           >
             YK
           </Link>
-          <div className="flex gap-8 items-center">
+          <div
+            className={`flex items-center gap-2 text-xs sm:text-sm tracking-tight flex-shrink min-w-0 ${
+              scrolled ? 'text-white' : 'text-black'
+            }`}
+            style={{ fontFamily: 'var(--font-press-start), var(--font-vt323), ui-monospace, monospace' }}
+          >
+            <span className="whitespace-nowrap flex-shrink-0">{formatNavTime(now)}</span>
+            <span className="opacity-80 flex-shrink-0">·</span>
+            <span className="flex items-center gap-0.5 whitespace-nowrap flex-shrink-0">
+              <span>{weatherIcon}</span>
+              {weather != null && <span>{weather.temp}°F</span>}
+            </span>
+          </div>
+          <div className="flex gap-8 items-center flex-shrink-0">
             <Link 
               href="/projects" 
               className={`text-2xl font-bold relative group ${
