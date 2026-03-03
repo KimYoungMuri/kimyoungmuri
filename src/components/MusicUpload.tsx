@@ -14,6 +14,9 @@ export default function MusicUpload({ onUploadComplete }: MusicUploadProps) {
     try {
       setUploading(true)
 
+      if (!supabase) {
+        throw new Error('Storage is not configured.')
+      }
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error('You must select a file to upload.')
       }

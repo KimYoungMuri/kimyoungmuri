@@ -34,10 +34,16 @@ export default function MusicPage() {
   };
 
   const fetchSongs = async () => {
+    const client = supabase;
+    if (!client) {
+      setError('Configuration missing. Please set Supabase env vars.');
+      setLoading(false);
+      return;
+    }
     try {
       setLoadingProgress(10);
       // Test bucket access first
-      const testAccess = await supabase.storage.from('music').list()
+      const testAccess = await client.storage.from('music').list()
       console.log('Testing bucket access:', testAccess)
 
       if (testAccess.error) {
@@ -47,7 +53,7 @@ export default function MusicPage() {
 
       setLoadingProgress(30);
       // If we can access the bucket, try to get the files
-      const { data: files, error: listError } = await supabase
+      const { data: files, error: listError } = await client
         .storage
         .from('music')
         .list('', {
@@ -76,7 +82,7 @@ export default function MusicPage() {
       // Get signed URLs for each MP3 file
       const songList = await Promise.all(
         mp3Files.map(async (file) => {
-          const { data, error: signedUrlError } = await supabase
+          const { data, error: signedUrlError } = await client
             .storage
             .from('music')
             .createSignedUrl(file.name, 60 * 60); // 1 hour expiry
