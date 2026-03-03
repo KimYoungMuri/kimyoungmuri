@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase, supabaseStorageUrl } from '@/lib/supabase'
+import { supabase, supabaseStorageUrl, supabaseConfigMissing } from '@/lib/supabase'
 import WaveformPlayer from '@/components/WaveformPlayer'
 import Image from 'next/image'
 
@@ -36,7 +36,10 @@ export default function MusicPage() {
   const fetchSongs = async () => {
     const client = supabase;
     if (!client) {
-      setError('Configuration missing. Please set Supabase env vars.');
+      const hint = supabaseConfigMissing
+        ? `Set ${supabaseConfigMissing} in Vercel → Settings → Environment Variables (Production), then redeploy.`
+        : 'Set Supabase env vars in Vercel, then redeploy.';
+      setError(`Configuration missing. ${hint}`);
       setLoading(false);
       return;
     }
