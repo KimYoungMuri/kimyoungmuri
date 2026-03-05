@@ -57,32 +57,20 @@ export default function Navbar() {
       scrolled ? 'bg-[#75B2DD]' : 'bg-white'
     }`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 gap-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3 md:py-0 md:h-16 md:justify-between md:gap-4">
           <Link 
             href="/" 
-            className={`text-2xl font-bold border-2 border-black px-3 py-1 flex-shrink-0 ${
+            className={`text-xl sm:text-2xl font-bold border-2 border-black px-2 py-0.5 sm:px-3 sm:py-1 flex-shrink-0 order-1 ${
               scrolled ? 'text-white border-white' : 'text-black border-black'
             }`}
           >
             YK
           </Link>
-          <div
-            className={`flex items-center gap-2 text-xs sm:text-sm tracking-tight flex-shrink min-w-0 ${
-              scrolled ? 'text-white' : 'text-black'
-            }`}
-            style={{ fontFamily: 'var(--font-press-start), var(--font-vt323), ui-monospace, monospace' }}
-          >
-            <span className="whitespace-nowrap flex-shrink-0">{formatNavTime(now)}</span>
-            <span className="opacity-80 flex-shrink-0">·</span>
-            <span className="flex items-center gap-0.5 whitespace-nowrap flex-shrink-0">
-              <span>{weatherIcon}</span>
-              {weather != null && <span>{weather.temp}°F</span>}
-            </span>
-          </div>
-          <div className="flex gap-8 items-center flex-shrink-0">
+          {/* On mobile: order-2 so links sit next to YK on row 1. On md: order-3 so date/time is in the middle. */}
+          <div className="flex gap-3 sm:gap-6 md:gap-8 items-center flex-shrink-0 order-2 md:order-3 min-w-0">
             <Link 
               href="/projects" 
-              className={`text-2xl font-bold relative group ${
+              className={`text-sm sm:text-lg md:text-2xl font-bold relative group whitespace-nowrap ${
                 scrolled ? 'text-white' : 'text-black'
               }`}
             >
@@ -95,7 +83,7 @@ export default function Navbar() {
             </Link>
             <Link 
               href="/music" 
-              className={`text-2xl font-bold relative group ${
+              className={`text-sm sm:text-lg md:text-2xl font-bold relative group whitespace-nowrap ${
                 scrolled ? 'text-white' : 'text-black'
               }`}
             >
@@ -108,7 +96,7 @@ export default function Navbar() {
             </Link>
             <Link 
               href="/blog" 
-              className={`text-2xl font-bold relative group ${
+              className={`text-sm sm:text-lg md:text-2xl font-bold relative group whitespace-nowrap ${
                 scrolled ? 'text-white' : 'text-black'
               }`}
             >
@@ -119,7 +107,7 @@ export default function Navbar() {
                 } transition-all duration-200 group-hover:h-full -z-10`}></span>
               </span>
             </Link>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <a 
                 href="https://github.com/KimYoungMuri"
                 target="_blank"
@@ -127,7 +115,7 @@ export default function Navbar() {
                 className="transition-colors duration-200"
               >
                 <svg 
-                  className={`w-6 h-6 transition-colors duration-200 ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-200 ${
                     scrolled ? 'fill-white hover:fill-gray-100' : 'fill-black hover:fill-[#75B2DD]'
                   }`}
                   xmlns="http://www.w3.org/2000/svg" 
@@ -143,7 +131,7 @@ export default function Navbar() {
                 className="transition-colors duration-200"
               >
                 <svg 
-                  className={`w-6 h-6 transition-colors duration-200 ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-200 ${
                     scrolled ? 'fill-white hover:fill-gray-100' : 'fill-black hover:fill-[#75B2DD]'
                   }`}
                   xmlns="http://www.w3.org/2000/svg" 
@@ -155,7 +143,7 @@ export default function Navbar() {
             </div>
             <a 
               href="mailto:yk3057@columbia.edu"
-              className={`text-2xl font-bold px-4 py-2 border-2 rounded-lg transition-colors ${
+              className={`text-sm sm:text-base md:text-2xl font-bold px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 border-2 rounded-lg transition-colors whitespace-nowrap ${
                 scrolled 
                   ? 'border-white text-white hover:bg-white hover:text-[#75B2DD]' 
                   : 'border-[#75B2DD] text-black hover:bg-[#75B2DD] hover:text-white hover:border-[#75B2DD]'
@@ -163,6 +151,20 @@ export default function Navbar() {
             >
               Contact Me
             </a>
+          </div>
+          {/* Date/time + weather: full width on mobile so it wraps to row 2; between YK and links on md+ */}
+          <div
+            className={`flex items-center justify-center md:justify-start gap-2 text-xs sm:text-sm tracking-tight flex-shrink-0 order-3 md:order-2 w-full md:w-auto min-w-0 ${
+              scrolled ? 'text-white' : 'text-black'
+            }`}
+            style={{ fontFamily: 'var(--font-press-start), var(--font-vt323), ui-monospace, monospace' }}
+          >
+            <span className="whitespace-nowrap flex-shrink-0">{formatNavTime(now)}</span>
+            <span className="opacity-80 flex-shrink-0">·</span>
+            <span className="flex items-center gap-0.5 whitespace-nowrap flex-shrink-0">
+              <span>{weatherIcon}</span>
+              {weather != null && <span>{weather.temp}°F</span>}
+            </span>
           </div>
         </div>
       </div>
